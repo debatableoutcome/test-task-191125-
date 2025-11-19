@@ -104,7 +104,7 @@
 
 <script setup lang="ts">
 import { useNotesStore } from '@/stores/notes'
-import { useNoteEditor } from '@/composables/useNoteEditor'
+
 
 defineOptions({ name: 'Editor' })
 
@@ -212,16 +212,25 @@ const deleteNote = () => {
 }
 
 const handleKeydown = (event: KeyboardEvent) => {
+  if (!ready.value || cancelModalOpen.value || deleteModalOpen.value) {
+    return
+  }
   const isCtrlOrMeta = event.ctrlKey || event.metaKey
   if (!isCtrlOrMeta) {
     return
   }
   if (event.key === 'z' && !event.shiftKey) {
+    if (!canUndo.value) {
+      return
+    }
     event.preventDefault()
     undo()
     return
   }
   if (event.key === 'Z' || (event.key === 'z' && event.shiftKey)) {
+    if (!canRedo.value) {
+      return
+    }
     event.preventDefault()
     redo()
   }

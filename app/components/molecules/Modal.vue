@@ -67,13 +67,15 @@ watch(
   () => props.modelValue,
   value => {
     if (value) {
-      lastFocusedElement = document.activeElement
+      if (typeof document !== 'undefined') {
+        lastFocusedElement = document.activeElement
+      }
       nextTick(() => {
         if (dialogRef.value) {
           dialogRef.value.focus()
         }
       })
-    } else if (lastFocusedElement instanceof HTMLElement) {
+    } else if (typeof document !== 'undefined' && lastFocusedElement instanceof HTMLElement) {
       lastFocusedElement.focus()
       lastFocusedElement = null
     }

@@ -1,5 +1,5 @@
 <template>
-  <Editor :is-new="true" />
+  <OrganismsEditor :is-new="true" />
 </template>
 
 <script setup lang="ts">

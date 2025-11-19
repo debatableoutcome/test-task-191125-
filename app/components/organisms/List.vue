@@ -32,6 +32,7 @@
       confirm-label='Удалить'
       cancel-label='Отмена'
       @confirm='performDelete'
+      @cancel='handleDeleteCancel'
     />
   </section>
 </template>
@@ -58,10 +59,19 @@ const confirmDelete = (id: string) => {
   deleteModalOpen.value = true
 }
 
+const closeDeleteModal = () => {
+  deleteModalOpen.value = false
+  noteIdToDelete.value = null
+}
+
 const performDelete = () => {
   if (noteIdToDelete.value) {
     notesStore.deleteNote(noteIdToDelete.value)
   }
-  noteIdToDelete.value = null
+  closeDeleteModal()
+}
+
+const handleDeleteCancel = () => {
+  closeDeleteModal()
 }
 </script>
