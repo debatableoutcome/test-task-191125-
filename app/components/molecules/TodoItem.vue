@@ -10,7 +10,7 @@
       :class="{ 'todo-item__text-input--done': todo.done }"
       variant="bare"
       :model-value="todo.text"
-      placeholder="Todo text"
+      placeholder="Текст задачи"
       @update:model-value="updateText"
     />
     <div class="todo-item__actions">

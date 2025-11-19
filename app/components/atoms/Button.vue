@@ -3,6 +3,7 @@
     :type="type"
     :disabled="disabled"
     :class="classes"
+    :title="titleAttr || undefined"
     @click="handleClick"
   >
     <slot />
@@ -17,11 +18,13 @@ const props = withDefaults(
     type?: 'button' | 'submit' | 'reset'
     variant?: 'primary' | 'secondary' | 'danger' | 'ghost'
     disabled?: boolean
+    titleAttr?: string
   }>(),
   {
     type: 'button',
     variant: 'primary',
-    disabled: false
+    disabled: false,
+    titleAttr: ''
   }
 )
 

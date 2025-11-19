@@ -134,13 +134,18 @@ export const useNoteEditor = () => {
 
   const canUndo = computed(() => history.value.length > 0)
   const canRedo = computed(() => future.value.length > 0)
+  const hasEmptyTodos = computed(() =>
+    draft.value.todos.some(todo => todo.text.trim().length === 0)
+  )
   const isDirty = computed(() => {
     if (!initialNote.value) {
       return false
     }
     return JSON.stringify(draft.value) !== JSON.stringify(initialNote.value)
   })
-  const saveDisabled = computed(() => draft.value.title.trim().length === 0)
+  const saveDisabled = computed(
+    () => draft.value.title.trim().length === 0 || hasEmptyTodos.value
+  )
 
   return {
     ready,
@@ -149,6 +154,7 @@ export const useNoteEditor = () => {
     canUndo,
     canRedo,
     isDirty,
+    hasEmptyTodos,
     saveDisabled,
     createNewDraft,
     setNote,

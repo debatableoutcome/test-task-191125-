@@ -3,6 +3,29 @@
     v-if='ready'
     class='todo-editor'
   >
+    <div class='todo-editor__top-controls'>
+      <div class='todo-editor__history'>
+        <AtomsButton
+          variant='secondary'
+          :disabled='!canUndo'
+          title-attr='Отменить последнее действие'
+          @click='undo'
+        >
+          <span class='todo-editor__icon-symbol'>↩</span>
+          <span class='todo-editor__icon-label'>Шаг назад</span>
+        </AtomsButton>
+        <AtomsButton
+          variant='secondary'
+          :disabled='!canRedo'
+          title-attr='Повторить отменённое действие'
+          @click='redo'
+        >
+          <span class='todo-editor__icon-symbol'>↷</span>
+          <span class='todo-editor__icon-label'>Шаг вперёд</span>
+        </AtomsButton>
+      </div>
+    </div>
+
     <div class='todo-editor__field'>
       <label
         class='todo-editor__label'
@@ -37,6 +60,12 @@
         >
           Добавить задачу
         </AtomsButton>
+        <div
+          v-if='hasEmptyTodos'
+          class='todo-editor__hint'
+        >
+          Заполните текст всех задач перед сохранением
+        </div>
       </div>
     </div>
 
@@ -52,7 +81,7 @@
           variant='secondary'
           @click='handleCancelClick'
         >
-          Отмена
+          Отменить редактирование
         </AtomsButton>
         <AtomsButton
           v-if='!isNew'
@@ -60,22 +89,6 @@
           @click='handleDeleteClick'
         >
           Удалить
-        </AtomsButton>
-      </div>
-      <div class='todo-editor__toolbar-group'>
-        <AtomsButton
-          variant='secondary'
-          :disabled='!canUndo'
-          @click='undo'
-        >
-          Отменить
-        </AtomsButton>
-        <AtomsButton
-          variant='secondary'
-          :disabled='!canRedo'
-          @click='redo'
-        >
-          Повторить
         </AtomsButton>
       </div>
     </div>
@@ -122,6 +135,7 @@ const {
   canUndo,
   canRedo,
   isDirty,
+  hasEmptyTodos,
   saveDisabled,
   createNewDraft,
   setNote,
