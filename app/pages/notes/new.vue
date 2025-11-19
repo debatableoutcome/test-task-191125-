@@ -1,3 +1,7 @@
 <template>
-  <OrganismsEditor is-new />
+  <Editor :is-new="true" />
 </template>
+
+<script setup lang="ts">
+
+</script>

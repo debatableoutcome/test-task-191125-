@@ -103,9 +103,8 @@
 
 
 <script setup lang="ts">
-import type { Note, Todo } from '@/types/notes'
 import { useNotesStore } from '@/stores/notes'
-
+import { useNoteEditor } from '@/composables/useNoteEditor'
 
 defineOptions({ name: 'Editor' })
 
@@ -117,44 +116,36 @@ const props = defineProps<{
 const router = useRouter()
 const notesStore = useNotesStore()
 
+const {
+  ready,
+  draft,
+  canUndo,
+  canRedo,
+  isDirty,
+  saveDisabled,
+  createNewDraft,
+  setNote,
+  updateTitle,
+  addTodo,
+  removeTodo,
+  toggleTodo,
+  updateTodoText,
+  undo,
+  redo,
+  resetToInitial,
+  syncInitialWithDraft
+} = useNoteEditor()
+
 notesStore.initFromStorage()
 
 const isNew = computed(() => !!props.isNew)
 
-const initialNote = ref<Note | null>(null)
-const draft = ref<Note>({
-  id: '',
-  title: '',
-  todos: []
-})
-
-const history = ref<Note[]>([])
-const future = ref<Note[]>([])
-
 const cancelModalOpen = ref(false)
 const deleteModalOpen = ref(false)
-const ready = ref(false)
-
-const cloneNote = (note: Note): Note => {
-  return JSON.parse(JSON.stringify(note)) as Note
-}
-
-const generateId = () => {
-  return `${Date.now()}-${Math.random().toString(16).slice(2)}`
-}
 
 const setupInitial = () => {
   if (isNew.value) {
-    const created: Note = {
-      id: generateId(),
-      title: '',
-      todos: []
-    }
-    initialNote.value = cloneNote(created)
-    draft.value = cloneNote(created)
-    history.value = []
-    future.value = []
-    ready.value = true
+    createNewDraft()
     return
   }
   if (!props.noteId) {
@@ -166,120 +157,16 @@ const setupInitial = () => {
     router.push('/')
     return
   }
-  initialNote.value = cloneNote(existing)
-  draft.value = cloneNote(existing)
-  history.value = []
-  future.value = []
-  ready.value = true
+  setNote(existing)
 }
 
 setupInitial()
 
-const pushHistory = () => {
-  history.value.push(cloneNote(draft.value))
-  if (history.value.length > 50) {
-    history.value.shift()
-  }
-  future.value = []
-}
-
-const canUndo = computed(() => history.value.length > 0)
-const canRedo = computed(() => future.value.length > 0)
-
-const undo = () => {
-  if (!history.value.length) {
-    return
-  }
-  future.value.push(cloneNote(draft.value))
-  const previous = history.value.pop()
-  if (previous) {
-    draft.value = previous
-  }
-}
-
-const redo = () => {
-  if (!future.value.length) {
-    return
-  }
-  history.value.push(cloneNote(draft.value))
-  const next = future.value.pop()
-  if (next) {
-    draft.value = next
-  }
-}
-
 const titleModel = computed({
   get: () => draft.value.title,
   set: value => {
-    if (value === draft.value.title) {
-      return
-    }
-    pushHistory()
-    draft.value.title = value
+    updateTitle(value)
   }
-})
-
-const addTodo = () => {
-  pushHistory()
-  const todo: Todo = {
-    id: generateId(),
-    text: '',
-    done: false
-  }
-  draft.value.todos.push(todo)
-}
-
-const removeTodo = (id: string) => {
-  pushHistory()
-  draft.value.todos = draft.value.todos.filter(
-    (todo: Todo) => todo.id !== id
-  )
-}
-
-const toggleTodo = (id: string) => {
-  pushHistory()
-  draft.value.todos = draft.value.todos.map((todo: Todo) => {
-    if (todo.id === id) {
-      return {
-        ...todo,
-        done: !todo.done
-      }
-    }
-    return todo
-  })
-}
-
-const updateTodoText = (id: string, text: string) => {
-  const currentTodo = draft.value.todos.find(
-    (todo: Todo) => todo.id === id
-  )
-  if (!currentTodo || currentTodo.text === text) {
-    return
-  }
-  pushHistory()
-  draft.value.todos = draft.value.todos.map((todo: Todo) => {
-    if (todo.id === id) {
-      return {
-        ...todo,
-        text
-      }
-    }
-    return todo
-  })
-}
-
-
-const isDirty = computed(() => {
-  if (!initialNote.value) {
-    return false
-  }
-  const left = JSON.stringify(draft.value)
-  const right = JSON.stringify(initialNote.value)
-  return left !== right
-})
-
-const saveDisabled = computed(() => {
-  return draft.value.title.trim().length === 0
 })
 
 const handleSave = () => {
@@ -291,9 +178,7 @@ const handleSave = () => {
   } else {
     notesStore.updateNote(draft.value)
   }
-  initialNote.value = cloneNote(draft.value)
-  history.value = []
-  future.value = []
+  syncInitialWithDraft()
   router.push('/')
 }
 
@@ -306,11 +191,7 @@ const handleCancelClick = () => {
 }
 
 const cancelEditing = () => {
-  if (initialNote.value) {
-    draft.value = cloneNote(initialNote.value)
-  }
-  history.value = []
-  future.value = []
+  resetToInitial()
   router.push('/')
 }
 
