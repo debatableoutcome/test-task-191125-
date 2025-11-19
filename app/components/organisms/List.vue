@@ -1,0 +1,69 @@
+<template>
+  <section class='notes'>
+    <h1 class='visually-hidden'>
+      Заметки
+    </h1>
+
+    <div
+      v-if='!notes.length'
+      class='notes__empty'
+    >
+      Пока нет ни одной заметки. Создай первую заметку.
+    </div>
+
+    <div
+      v-else
+      class='notes__list'
+    >
+      <MoleculesCard
+        v-for='note in notes'
+        :key='note.id'
+        :note='note'
+        @edit='openEdit'
+        @delete='confirmDelete'
+      />
+    </div>
+
+    <MoleculesModal
+      v-if='noteIdToDelete'
+      v-model='deleteModalOpen'
+      title='Удалить заметку'
+      message='Удалить эту заметку? Действие нельзя будет отменить.'
+      confirm-label='Удалить'
+      cancel-label='Отмена'
+      @confirm='performDelete'
+    />
+  </section>
+</template>
+
+<script setup lang="ts">
+import { useNotesStore } from '~/stores/notes'
+
+defineOptions({ name: 'List' })
+
+const notesStore = useNotesStore()
+const router = useRouter()
+
+notesStore.initFromStorage()
+
+const notes = computed(() => notesStore.notes)
+
+const deleteModalOpen = ref(false)
+const noteIdToDelete = ref<string | null>(null)
+
+const openEdit = (id: string) => {
+  router.push(`/notes/${id}`)
+}
+
+const confirmDelete = (id: string) => {
+  noteIdToDelete.value = id
+  deleteModalOpen.value = true
+}
+
+const performDelete = () => {
+  if (noteIdToDelete.value) {
+    notesStore.deleteNote(noteIdToDelete.value)
+  }
+  noteIdToDelete.value = null
+}
+</script>
