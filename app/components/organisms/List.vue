@@ -44,8 +44,6 @@ defineOptions({ name: 'List' })
 const notesStore = useNotesStore()
 const router = useRouter()
 
-notesStore.initFromStorage()
-
 const notes = computed(() => notesStore.notes)
 
 const deleteModalOpen = ref(false)

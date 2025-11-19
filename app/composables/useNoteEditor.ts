@@ -28,6 +28,7 @@ export const useNoteEditor = () => {
   }
 
   const setNote = (note: Note) => {
+    ready.value = false
     initialNote.value = cloneNote(note)
     draft.value = cloneNote(note)
     history.value = []

@@ -136,14 +136,13 @@ const {
   syncInitialWithDraft
 } = useNoteEditor()
 
-notesStore.initFromStorage()
-
 const isNew = computed(() => !!props.isNew)
 
 const cancelModalOpen = ref(false)
 const deleteModalOpen = ref(false)
 
 const setupInitial = () => {
+  ready.value = false
   if (isNew.value) {
     createNewDraft()
     return
@@ -160,7 +159,13 @@ const setupInitial = () => {
   setNote(existing)
 }
 
-setupInitial()
+watch(
+  () => [props.noteId, isNew.value],
+  () => {
+    setupInitial()
+  },
+  { immediate: true }
+)
 
 const titleModel = computed({
   get: () => draft.value.title,

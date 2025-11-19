@@ -11,21 +11,24 @@ export const useNotesStore = defineStore('notes', () => {
   const notes = ref<Note[]>([])
   const initialized = ref(false)
 
-  const getById = (id: string) =>
-    notes.value.find((note: Note) => note.id === id) || null
+  const getById = (id: string) => {
+    initFromStorage()
+    return notes.value.find((note: Note) => note.id === id) || null
+  }
 
   const initFromStorage = () => {
     if (initialized.value) {
       return
     }
-    if (import.meta.client) {
-      const raw = window.localStorage.getItem(STORAGE_KEY)
-      if (raw) {
-        try {
-          notes.value = JSON.parse(raw) as Note[]
-        } catch {
-          notes.value = []
-        }
+    if (!import.meta.client) {
+      return
+    }
+    const raw = window.localStorage.getItem(STORAGE_KEY)
+    if (raw) {
+      try {
+        notes.value = JSON.parse(raw) as Note[]
+      } catch {
+        notes.value = []
       }
     }
     initialized.value = true
@@ -39,11 +42,13 @@ export const useNotesStore = defineStore('notes', () => {
   }
 
   const addNote = (note: Note) => {
+    initFromStorage()
     notes.value.push(cloneNote(note))
     persist()
   }
 
   const updateNote = (note: Note) => {
+    initFromStorage()
     const index = notes.value.findIndex((item: Note) => item.id === note.id)
     if (index !== -1) {
       notes.value[index] = cloneNote(note)
@@ -52,6 +57,7 @@ export const useNotesStore = defineStore('notes', () => {
   }
 
   const deleteNote = (id: string) => {
+    initFromStorage()
     notes.value = notes.value.filter((item: Note) => item.id !== id)
     persist()
   }
