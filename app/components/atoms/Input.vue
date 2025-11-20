@@ -4,6 +4,7 @@
     :type="type"
     :value="modelValue"
     :placeholder="placeholder"
+    :autofocus="autofocus"
     :class="classes"
     @input="handleInput"
   />
@@ -19,11 +20,13 @@ const props = withDefaults(
     type?: string
     placeholder?: string
     variant?: 'default' | 'bare'
+    autofocus?: boolean
   }>(),
   {
     type: 'text',
     placeholder: '',
-    variant: 'default'
+    variant: 'default',
+    autofocus: false
   }
 )
 

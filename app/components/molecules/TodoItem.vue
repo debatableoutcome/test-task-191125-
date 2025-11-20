@@ -10,6 +10,7 @@
       :class="{ 'todo-item__text-input--done': todo.done }"
       variant="bare"
       :model-value="todo.text"
+      :autofocus="autofocus"
       placeholder="Текст задачи"
       @update:model-value="updateText"
     />
@@ -18,7 +19,10 @@
         variant="ghost"
         @click="remove"
       >
-        ✕
+        <FontAwesomeIcon
+          :icon="['fas', 'trash']"
+          class="button__icon"
+        />
       </AtomsButton>
     </div>
   </div>
@@ -31,6 +35,7 @@ defineOptions({ name: 'TodoItem' })
 
 const props = defineProps<{
   todo: Todo
+  autofocus?: boolean
 }>()
 
 const emit = defineEmits<{

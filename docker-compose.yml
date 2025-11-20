@@ -1,0 +1,10 @@
+version: '3.8'
+
+services:
+  notes-app:
+    build: .
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=development
+    command: npm run dev -- --host 0.0.0.0 --port 3000

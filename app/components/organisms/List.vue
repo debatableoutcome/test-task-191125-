@@ -1,38 +1,38 @@
 <template>
-  <section class='notes'>
-    <h1 class='visually-hidden'>
-      Заметки
+  <section class="notes">
+    <h1 class="visually-hidden">
+      Все заметки
     </h1>
 
     <div
-      v-if='!notes.length'
-      class='notes__empty'
+      v-if="!notes.length"
+      class="notes__empty"
     >
-      Пока нет ни одной заметки. Создай первую заметку.
+      Пока нет ни одной заметки. Нажмите «Создать заметку», чтобы добавить первую.
     </div>
 
     <div
       v-else
-      class='notes__list'
+      class="notes__list"
     >
       <MoleculesCard
-        v-for='note in notes'
-        :key='note.id'
-        :note='note'
-        @edit='openEdit'
-        @delete='confirmDelete'
+        v-for="note in notes"
+        :key="note.id"
+        :note="note"
+        @edit="openEdit"
+        @delete="confirmDelete"
       />
     </div>
 
     <MoleculesModal
-      v-if='noteIdToDelete'
-      v-model='deleteModalOpen'
-      title='Удалить заметку'
-      message='Удалить эту заметку? Действие нельзя будет отменить.'
-      confirm-label='Удалить'
-      cancel-label='Отмена'
-      @confirm='performDelete'
-      @cancel='handleDeleteCancel'
+      v-if="noteIdToDelete"
+      v-model="deleteModalOpen"
+      title="Удалить заметку?"
+      message="Удалить заметку? Это действие нельзя отменить."
+      confirm-label="Удалить"
+      cancel-label="Отмена"
+      @confirm="performDelete"
+      @cancel="handleDeleteCancel"
     />
   </section>
 </template>
@@ -44,6 +44,8 @@ defineOptions({ name: 'List' })
 
 const notesStore = useNotesStore()
 const router = useRouter()
+
+notesStore.initFromStorage()
 
 const notes = computed(() => notesStore.notes)
 

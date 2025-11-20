@@ -11,26 +11,36 @@ export default defineNuxtConfig({
     strict: true,
     typeCheck: true
   },
-
+  experimental: {
+    appManifest: false
+  },
+  app: {
+    head: {
+      htmlAttrs: { lang: 'ru' },
+      meta: [
+        { charset: 'utf-8' },
+        { name: 'viewport', content: 'width=device-width, initial-scale=1' },
+        { name: 'description', content: 'Простые заметки со списками задач' }
+      ],
+      title: 'Заметки'
+    }
+  },
   modules: ['@pinia/nuxt'],
-
   css: ['@/assets/styles/main.scss'],
-
   components: [
     {
-      path: '~/components/atoms',
+      path: '~/app/components/atoms',
       prefix: 'Atoms'
     },
     {
-      path: '~/components/molecules',
+      path: '~/app/components/molecules',
       prefix: 'Molecules'
     },
     {
-      path: '~/components/organisms',
+      path: '~/app/components/organisms',
       prefix: 'Organisms'
     }
   ],
-
   vite: {
     resolve: {
       alias: {

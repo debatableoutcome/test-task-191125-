@@ -1,75 +1,45 @@
-# Nuxt Minimal Starter
+# Notes (Nuxt 3 SPA)
 
-Look at the [Nuxt documentation](https://nuxt.com/docs/getting-started/introduction) to learn more.
+Небольшое SPA на Nuxt 3 (nuxt@3.20.x, `experimental.appManifest` выключен) для заметок с задачами (todos). Pinia хранит данные и синхронизирует их в `localStorage`, так что русские названия и тексты задач сохраняются после перезагрузки. Есть undo/redo, модальные подтверждения и работа полностью на клиенте (SSR выключен).
 
-## Setup
-
-Make sure to install dependencies:
-
+## Как запустить локально (npm)
+1) Установить зависимости:
 ```bash
-# npm
 npm install
-
-# pnpm
-pnpm install
-
-# yarn
-yarn install
-
-# bun
-bun install
 ```
-
-## Development Server
-
-Start the development server on `http://localhost:3000`:
-
+2) Запустить dev-сервер:
 ```bash
-# npm
 npm run dev
-
-# pnpm
-pnpm dev
-
-# yarn
-yarn dev
-
-# bun
-bun run dev
 ```
+3) Открыть в браузере: http://localhost:3000/notes
 
-## Production
-
-Build the application for production:
-
+## Как запустить через Docker
+- В директории проекта выполните:
 ```bash
-# npm
-npm run build
-
-# pnpm
-pnpm build
-
-# yarn
-yarn build
-
-# bun
-bun run build
+docker-compose up --build
 ```
+- Это соберёт образ на базе `node:20-alpine`, установит зависимости и запустит `npm run dev -- --host 0.0.0.0 --port 3000` внутри контейнера.
+- Открыть: http://localhost:3000/notes
+- Остановить: `Ctrl+C`, затем при необходимости очистить контейнеры: `docker-compose down`.
 
-Locally preview production build:
+> Что важно знать: контейнер использует hot-reload дев-сервера, но код берётся из контекста сборки — если меняете файлы, пересоберите `docker-compose up --build` либо настройте volume (по умолчанию не подключен, чтобы исключить кэш-проблемы).
 
-```bash
-# npm
-npm run preview
+## Возможности
+- Список заметок с превью задач и подсказкой `+N ещё`.
+- Создание, редактирование, удаление заметок; добавление/удаление/редактирование задач; отметка выполнено.
+- Undo/redo кнопками или `Ctrl+Z` / `Ctrl+Shift+Z` (`Cmd` на macOS) во время редактирования.
+- Модальные окна подтверждения без alert/confirm, с управлением клавиатурой (Esc).
+- Стартовые данные на русском: «Список покупок», «Домашние дела».
 
-# pnpm
-pnpm preview
+## Структура
+- `layouts` — общий каркас (заголовок + кнопка создания).
+- `pages` — маршруты `/notes`, `/notes/new`, `/notes/:id`.
+- `app/components/*` — атомы/молекулы/организмы (Input, Button, Modal, Card, TodoItem, List, Editor).
+- `stores/notes.ts` — Pinia + `localStorage` с начальными данными.
+- `composables/useNoteEditor.ts` — черновик заметки и стек undo/redo.
+- `assets/styles/main.scss` — SCSS с BEM-классами.
 
-# yarn
-yarn preview
-
-# bun
-bun run preview
-```
-
-Check out the [deployment documentation](https://nuxt.com/docs/getting-started/deployment) for more information.
+## Мелочи поведения
+- Кнопка «Отменить редактирование» отключена, пока нет изменений; Save отключён, если заголовок пуст или есть пустые задачи.
+- Удаление/отмена всегда через модалку; Esc закрывает модалку.
+- Header-клик по «Заметки» ведёт на список.

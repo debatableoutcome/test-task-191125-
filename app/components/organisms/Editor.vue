@@ -1,123 +1,147 @@
 <template>
   <section
-    v-if='ready'
-    class='todo-editor'
+    v-if="ready"
+    class="todo-editor"
   >
-    <div class='todo-editor__top-controls'>
-      <div class='todo-editor__history'>
+    <div class="todo-editor__top-controls">
+      <div class="todo-editor__history">
         <AtomsButton
-          variant='secondary'
-          :disabled='!canUndo'
-          title-attr='Отменить последнее действие'
-          @click='undo'
+          variant="secondary"
+          :disabled="!canUndo"
+          @click="undo"
         >
-          <span class='todo-editor__icon-symbol'>↩</span>
-          <span class='todo-editor__icon-label'>Шаг назад</span>
+          <span class="todo-editor__icon-symbol">
+            <FontAwesomeIcon
+              :icon="['fas', 'arrow-rotate-left']"
+              class="button__icon"
+            />
+          </span>
+          <span class="todo-editor__icon-label">Отменить</span>
         </AtomsButton>
         <AtomsButton
-          variant='secondary'
-          :disabled='!canRedo'
-          title-attr='Повторить отменённое действие'
-          @click='redo'
+          variant="secondary"
+          :disabled="!canRedo"
+          @click="redo"
         >
-          <span class='todo-editor__icon-symbol'>↷</span>
-          <span class='todo-editor__icon-label'>Шаг вперёд</span>
+          <span class="todo-editor__icon-symbol">
+            <FontAwesomeIcon
+              :icon="['fas', 'arrow-rotate-right']"
+              class="button__icon"
+            />
+          </span>
+          <span class="todo-editor__icon-label">Вернуть</span>
         </AtomsButton>
       </div>
     </div>
 
-    <div class='todo-editor__field'>
+    <div class="todo-editor__field">
       <label
-        class='todo-editor__label'
-        for='note-title'
+        class="todo-editor__label"
+        for="note-title"
       >
-        Заголовок
+        Название заметки
       </label>
       <AtomsInput
-        id='note-title'
-        class='todo-editor__input'
-        v-model='titleModel'
-        placeholder='Название заметки'
+        id="note-title"
+        class="todo-editor__input"
+        v-model="titleModel"
+        placeholder="Введите заголовок"
       />
     </div>
 
-    <div class='todo-editor__field'>
-      <label class='todo-editor__label'>
-        Список задач
+    <div class="todo-editor__field">
+      <label class="todo-editor__label">
+        Задачи
       </label>
-      <div class='todo-list'>
+      <div class="todo-list">
         <MoleculesTodoItem
-          v-for='todo in draft.todos'
-          :key='todo.id'
-          :todo='todo'
-          @toggle='toggleTodo(todo.id)'
-          @updateText='updateTodoText(todo.id, $event)'
-          @remove='removeTodo(todo.id)'
+          v-for="todo in draft.todos"
+          :key="todo.id"
+          :todo="todo"
+          :autofocus="todo.id === focusTodoId"
+          @toggle="toggleTodo(todo.id)"
+          @updateText="updateTodoText(todo.id, $event)"
+          @remove="removeTodo(todo.id)"
         />
         <AtomsButton
-          variant='secondary'
-          @click='addTodo'
+          variant="secondary"
+          @click="addTodoAndFocus"
         >
-          Добавить задачу
+          <FontAwesomeIcon
+            :icon="['fas', 'plus']"
+            class="button__icon"
+          />
+          <span class="button__text">Добавить задачу</span>
         </AtomsButton>
         <div
-          v-if='hasEmptyTodos'
-          class='todo-editor__hint'
+          v-if="hasEmptyTodos"
+          class="todo-editor__hint"
         >
-          Заполните текст всех задач перед сохранением
+          Заполните текст у всех задач, чтобы сохранить заметку.
         </div>
       </div>
     </div>
 
-    <div class='todo-editor__toolbar'>
-      <div class='todo-editor__toolbar-group'>
+    <div class="todo-editor__toolbar">
+      <div class="todo-editor__toolbar-group">
         <AtomsButton
-          :disabled='saveDisabled'
-          @click='handleSave'
+          :disabled="saveDisabled"
+          @click="handleSave"
         >
-          Сохранить
+          <FontAwesomeIcon
+            :icon="['fas', 'floppy-disk']"
+            class="button__icon"
+          />
+          <span class="button__text">Сохранить</span>
         </AtomsButton>
         <AtomsButton
-          variant='secondary'
-          @click='handleCancelClick'
+          variant="secondary"
+          :disabled="!isDirty"
+          @click="handleCancelClick"
         >
-          Отменить редактирование
+          <FontAwesomeIcon
+            :icon="['fas', 'xmark']"
+            class="button__icon"
+          />
+          <span class="button__text">Отменить редактирование</span>
         </AtomsButton>
         <AtomsButton
-          v-if='!isNew'
-          variant='danger'
-          @click='handleDeleteClick'
+          v-if="!isNew"
+          variant="danger"
+          @click="handleDeleteClick"
         >
-          Удалить
+          <FontAwesomeIcon
+            :icon="['fas', 'trash']"
+            class="button__icon"
+          />
+          <span class="button__text">Удалить</span>
         </AtomsButton>
       </div>
     </div>
 
     <MoleculesModal
-      v-model='cancelModalOpen'
-      title='Отменить редактирование'
-      message='Отменить несохранённые изменения?'
-      confirm-label='Отменить изменения'
-      cancel-label='Продолжить редактирование'
-      @confirm='cancelEditing'
+      v-model="cancelModalOpen"
+      title="Отменить редактирование?"
+      message="Отменить редактирование? Все несохранённые изменения будут потеряны."
+      confirm-label="Выйти без сохранения"
+      cancel-label="Продолжить редактирование"
+      @confirm="cancelEditing"
     />
 
     <MoleculesModal
-      v-if='!isNew'
-      v-model='deleteModalOpen'
-      title='Удалить заметку'
-      message='Удалить эту заметку? Действие нельзя будет отменить.'
-      confirm-label='Удалить'
-      cancel-label='Отмена'
-      @confirm='deleteNote'
+      v-if="!isNew"
+      v-model="deleteModalOpen"
+      title="Удалить заметку?"
+      message="Удалить заметку? Это действие нельзя отменить."
+      confirm-label="Удалить"
+      cancel-label="Отмена"
+      @confirm="deleteNote"
     />
   </section>
 </template>
 
-
 <script setup lang="ts">
 import { useNotesStore } from '@/stores/notes'
-
 
 defineOptions({ name: 'Editor' })
 
@@ -128,6 +152,7 @@ const props = defineProps<{
 
 const router = useRouter()
 const notesStore = useNotesStore()
+notesStore.initFromStorage()
 
 const {
   ready,
@@ -154,6 +179,7 @@ const isNew = computed(() => !!props.isNew)
 
 const cancelModalOpen = ref(false)
 const deleteModalOpen = ref(false)
+const focusTodoId = ref<string | null>(null)
 
 const setupInitial = () => {
   ready.value = false
@@ -162,12 +188,12 @@ const setupInitial = () => {
     return
   }
   if (!props.noteId) {
-    router.push('/')
+    router.push('/notes')
     return
   }
   const existing = notesStore.getById(props.noteId)
   if (!existing) {
-    router.push('/')
+    router.push('/notes')
     return
   }
   setNote(existing)
@@ -198,12 +224,12 @@ const handleSave = () => {
     notesStore.updateNote(draft.value)
   }
   syncInitialWithDraft()
-  router.push('/')
+  router.push('/notes')
 }
 
 const handleCancelClick = () => {
   if (!isDirty.value) {
-    router.push('/')
+    router.push('/notes')
     return
   }
   cancelModalOpen.value = true
@@ -211,7 +237,7 @@ const handleCancelClick = () => {
 
 const cancelEditing = () => {
   resetToInitial()
-  router.push('/')
+  router.push('/notes')
 }
 
 const handleDeleteClick = () => {
@@ -222,7 +248,13 @@ const deleteNote = () => {
   if (!isNew.value) {
     notesStore.deleteNote(draft.value.id)
   }
-  router.push('/')
+  router.push('/notes')
+}
+
+const addTodoAndFocus = () => {
+  addTodo()
+  const last = draft.value.todos[draft.value.todos.length - 1]
+  focusTodoId.value = last ? last.id : null
 }
 
 const handleKeydown = (event: KeyboardEvent) => {
