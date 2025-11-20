@@ -16,13 +16,10 @@ docker-compose up --build
 После сборки приложение доступно на http://localhost:3000/notes. Остановить Ctrl+C, очистить `docker-compose down`.
 
 ## Скриншоты
-### Десктоп — список
-![Десктоп список](public/desktop.png)
+![Десктоп список](./public/desktop.png)
 
-### Десктоп — редактор
-![Десктоп редактор](public/desktop-edit.png)
+![Десктоп редактор](./public/desktop-edit.png)
 
-### Мобильная версия
 ![Мобильная версия](public/mobile.png)
 
 ## Архитектура
