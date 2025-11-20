@@ -20,7 +20,7 @@ export default defineNuxtConfig({
       meta: [
         { charset: 'utf-8' },
         { name: 'viewport', content: 'width=device-width, initial-scale=1' },
-        { name: 'description', content: 'Простые заметки со списками задач' }
+        { name: 'description', content: 'Заметки с задачами на Nuxt 3' }
       ],
       title: 'Заметки'
     }

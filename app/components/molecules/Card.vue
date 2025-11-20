@@ -12,7 +12,6 @@
       <AtomsButton
         class="note-card__delete"
         variant="ghost"
-        :disabled="false"
         aria-label="Удалить заметку"
         @click="handleDelete"
       >
@@ -51,7 +50,6 @@
     <div class="note-card__actions">
       <AtomsButton
         variant="secondary"
-        :disabled="false"
         @click="handleEdit"
       >
         <FontAwesomeIcon
@@ -97,11 +95,11 @@ const tasksLabel = computed(() =>
   ])}`
 )
 
-  const handleEdit = () => {
-    emit('edit', props.note.id)
-  }
+const handleEdit = () => {
+  emit('edit', props.note.id)
+}
 
-  const handleDelete = () => {
-    emit('delete', props.note.id)
-  }
+const handleDelete = () => {
+  emit('delete', props.note.id)
+}
 </script>
