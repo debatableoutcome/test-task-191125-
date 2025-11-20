@@ -57,6 +57,12 @@ body {
   display: inline-flex;
   align-items: center;
   gap: 0.35rem;
+  outline: none;
+}
+
+.app__header-title:focus-visible {
+  outline: 2px solid $app-primary;
+  outline-offset: 2px;
 }
 
 .app__main {
