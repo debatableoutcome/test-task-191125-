@@ -5,15 +5,23 @@
 ## Запуск (npm)
 ```bash
 npm install
-npm run dev -- --host 0.0.0.0 --port 3000
+npm run dev
 ```
 Открыть: http://localhost:3000/notes
 
 ## Запуск через Docker
 ```bash
+docker compose up --build
+# или (старый вариант)
 docker-compose up --build
 ```
-После сборки приложение доступно на http://localhost:3000/notes. Остановить Ctrl+C, очистить `docker-compose down`.
+После сборки приложение будет доступно по адресу:
+http://localhost:3000
+
+Остановка контейнера:
+```bash
+Ctrl + C
+```
 
 ## Скриншоты
 ![Десктоп список](./public/desktop-list.png)
